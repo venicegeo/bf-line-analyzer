@@ -92,3 +92,29 @@ Geometry* smallestSegment(Point *p11, Point *p12, Point *p21, Point *p22){
   return l1->Union(l2);
 }
 
+std::string mlsToMlp(const std::string &input1){
+  std::string result;
+  WKTReader wktr;
+  WKTWriter wktw;
+  Geometry *mls = wktr.read(input1);
+
+  // First we have to properly node the linestrings. Union makes this easy.
+  Polygon *envelope = dynamic_cast<Polygon*>(mls->getEnvelope());
+  Geometry *nodedLineStrings = envelope->getExteriorRing()->Union(mls);
+
+  // The polygonizer creates polygons out of the linework
+  geos::operation::polygonize::Polygonizer polygonizer;
+  polygonizer.add(nodedLineStrings);
+  std::vector<Polygon*> *polygons = polygonizer.getPolygons();
+
+  // Annoyingly, we have to transform one vector type to another
+  std::vector<Geometry*> geometries;
+  for(int inx = 0; inx < polygons->size(); inx++){
+    geometries.push_back((*polygons)[inx]);
+  }
+
+  Geometry *mlp = GeometryFactory::getDefaultInstance()->createMultiPolygon(geometries);
+  result = wktw.write(mlp);
+  return result;
+}
+

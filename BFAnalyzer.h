@@ -23,4 +23,10 @@ limitations under the License.
 // input1, input2: two linestrings as WKT
 // returns an array of polygons as WKT 
 std::vector<std::string> polygonize(const std::string &input1, const std::string &input2);
+
+// Transforms a MultiLineString into a MultiPolygon
+// given that the LineStrings all touch the envelope
+// input1: a MultiLineString as WKT
+// a MultiPolygon as WKT 
+std::string mlsToMlp(const std::string &input1);
 #endif

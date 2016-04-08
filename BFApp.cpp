@@ -19,31 +19,40 @@ limitations under the License.
 #include <sstream>
 #include "BFAnalyzer.h"
 
+std::string loadFile(const char* filename);
+
 int main(int argc, const char* argv[])
 {
-  std::vector<std::string> polygons;
+  std::vector<std::string> strings;
   if((argc == 2) && (strcmp(argv[1], "-test") == 0)){
-    std::ifstream is1 ("../test/ls1.wkt");
-    std::ifstream is2 ("../test/ls2.wkt");
-    std::stringstream buffer1;
-    buffer1 << is1.rdbuf();
-    std::string str1 = buffer1.str();
-    const char *cc1 = str1.c_str();
-    std::stringstream buffer2;
-    buffer2 << is2.rdbuf();
-    std::string str2 = buffer2.str();
-    is1.close();
-    is2.close();
-    polygons = polygonize(str1, str2);
+    strings = polygonize(loadFile("../test/ls1.wkt"), loadFile("../test/ls2.wkt"));
   } else if(argc > 2){
-    polygons = polygonize(std::string(argv[1]), std::string(argv[2]));
+    if(strcmp(argv[1], "-mlp") == 0) {
+      strings.push_back(mlsToMlp(loadFile(argv[2])));
+    } else {
+      strings = polygonize(loadFile(argv[1]), loadFile(argv[2]));
+    }
   } else {
-    std::cout << "Usage: bf_la [wkt] [wkt]" << std::endl;
+    std::cout << "Usage:" << std::endl;
+    std::cout << "bf_la [wkt] [wkt] to analyze two linestrings" << std::endl;
+    std::cout << "bf_la -mlp [wkt] to transform a multilinestring to a multipolygon" << std::endl;
+    std::cout << "bf_la -test" << std::endl;
     return 1;
   }
-  for(int inx = 0; inx < polygons.size(); inx++){
-    std::cout << polygons[inx];
+  for(int inx = 0; inx < strings.size(); inx++){
+    std::cout << strings[inx];
   }
   std::cout << std::endl;
   return 0;
 }
+
+std::string loadFile(const char* filename){
+  std::string result;
+  std::ifstream ifs(filename);
+  std::stringstream buffer;
+  buffer << ifs.rdbuf();
+  result = buffer.str();
+  ifs.close();
+  return result;
+}
+
