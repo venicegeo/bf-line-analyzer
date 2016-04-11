@@ -1,9 +1,10 @@
 Analyzes lines.
 
-Polygonize finds the polygons between two linestrings.
+Depends on GEOS.
 
-More functions TBD?
+call `make` from the `bld` directory.
 
-Depends on GEOS
+Usage: 
+* bf_la [wkt] [wkt] - Polygonize (the default) finds the polygons between two linestrings.
+* bf_la -mlp [wkt] - Converts a MultiLineString to a MultiPolygon
 
-Usage: bf_la [wkt] [wkt]
